@@ -8,15 +8,16 @@
 function usage () {
 cat << EOF
 
-Usage: manager.sh [-h|-v|-c|-i|-r|-s]
+Usage: manager.sh [-h|-v|-c|-i|-r|-s|-u]
 
 OPTIONS:
    -h      Show this message
    -v      Verbose
    -c      Clones the repository
-   -i
-   -r
+   -i      Installs the code
+   -r      Runs the program
    -s      Syncs the database (creating it if not exists)
+   -u      Updates code and depoendencies
 
 EOF
 }
@@ -32,6 +33,8 @@ function execute () {
     printf "Done\n"
 }
 
+# IMPORTANT: Add virtualenv dependency
+
 function clone () {
     mkdir "$REPO_NAME"
     cd $REPO_NAME
@@ -42,7 +45,7 @@ function clone () {
 }
 
 function install () {
-
+    echo "TODO Install"
 }
 
 function run () {
@@ -140,7 +143,7 @@ while getopts "hvcirsu" OPTION; do
     esac
 done
 
-source config.sh
+source .config
 
 if [[ $CLONE -eq 1 ]]; then
         clone
@@ -157,3 +160,5 @@ fi
 if [[ $SYNC -eq 1 ]]; then
         sync
 fi
+
+###############################################################################
