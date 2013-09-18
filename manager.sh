@@ -169,12 +169,6 @@ while getopts "hvcirsu" OPTION; do
     esac
 done
 
-# Check root permission
-if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-    echo "Error: This script must be run as root"
-    exit 1
-fi
-
 source .config
 
 if [[ $CLONE -eq 1 ]]; then
