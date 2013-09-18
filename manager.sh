@@ -30,7 +30,11 @@ function execute () {
     else
         eval $1 &> /dev/null
     fi
-    printf "Done\n"
+    if [[ $? -ne 0 ]]; then
+        printf "ERROR\n"
+    else
+        printf "Done\n"
+    fi
 }
 
 # IMPORTANT: Add virtualenv dependency
@@ -45,7 +49,29 @@ function clone () {
 }
 
 function install () {
-    echo "TODO Install"
+    CHECK=-1
+    type yum >/dev/null 2>&1
+    if [[ $? = 0 ]]; then
+        CHECK=0
+    fi
+
+    type apt-get >/dev/null 2>&1
+    if [[ $? = 0 ]]; then
+        CHECK=1
+    fi
+
+    case $CHECK in
+        0)
+            execute "bash install-scripts/yum-dependencies.sh" "Installing dependencies using yum"
+            ;;
+        1)
+            execute "bash install-scripts/aptitude-dependencies.sh" "Installing dependencies using aptitude"
+            ;;
+        *)
+            printf "Unsupported package manager... ABORTING"
+            exit 1
+            ;;
+    esac
 }
 
 function run () {
@@ -67,7 +93,7 @@ function run () {
         `$value`
     done < "$file"
 
-    foreman start
+    execute "foreman start" "Starting foreman"
 }
 
 function sync () {
@@ -142,6 +168,12 @@ while getopts "hvcirsu" OPTION; do
             ;;
     esac
 done
+
+# Check root permission
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+    echo "Error: This script must be run as root"
+    exit 1
+fi
 
 source .config
 
